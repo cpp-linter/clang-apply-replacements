@@ -3,7 +3,6 @@ project(${SKBUILD_PROJECT_NAME} VERSION ${SKBUILD_PROJECT_VERSION})
 
 message(STATUS "clang-apply-replacements wheel version: ${SKBUILD_PROJECT_VERSION}")
 string(REGEX MATCH "^([0-9]+)\.([0-9]+)\.([0-9]+)" LLVM_VERSION "${SKBUILD_PROJECT_VERSION}")
-set(LLVM_VERSION_MAJOR ${CMAKE_MATCH_1}) # https://cmake.org/cmake/help/latest/variable/CMAKE_MATCH_n.html
 message(STATUS "LLVM version: ${LLVM_VERSION}")
 
 # Define a build rule for clang-apply-replacements
@@ -48,8 +47,4 @@ install(
   DESTINATION clang_apply_replacements/data/bin
 )
 
-install(
-  DIRECTORY
-    ${CMAKE_BINARY_DIR}/llvm/lib/clang/${LLVM_VERSION}/include
-  DESTINATION clang_apply_replacements/data/lib/clang/${LLVM_VERSION}
-)
+
