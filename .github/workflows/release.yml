@@ -147,12 +147,9 @@ jobs:
           rm -r clang_apply_replacements
           pip install sdist/*.tar.gz
 
-      - name: Install test requirements
-        run:
-          python -m pip install -r requirements-dev.txt
-
       - name: Run test suite
         run:
+          python -m pip install pytest
           python -m pytest
 
   upload_pypi:
