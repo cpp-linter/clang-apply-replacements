@@ -7,7 +7,13 @@ set(LLVM_VERSION_MAJOR ${CMAKE_MATCH_1}) # https://cmake.org/cmake/help/latest/v
 message(STATUS "LLVM version: ${LLVM_VERSION}")
 
 # Define a build rule for clang-apply-replacements
-set(LLVM_DOWNLOAD_URL "https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-project-${LLVM_VERSION}.src.tar.xz")
+# LLVM releases before 12.0.0 use a filename without ".src" (e.g., llvm-project-11.0.0.tar.xz),
+# while LLVM >= 12.0.0 use llvm-project-X.Y.Z.src.tar.xz.
+if(LLVM_VERSION_MAJOR LESS 12)
+  set(LLVM_DOWNLOAD_URL "https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-project-${LLVM_VERSION}.tar.xz")
+else()
+  set(LLVM_DOWNLOAD_URL "https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/llvm-project-${LLVM_VERSION}.src.tar.xz")
+endif()
 include(ExternalProject)
 ExternalProject_add(build-clang-apply-replacements
   URL "${LLVM_DOWNLOAD_URL}"
