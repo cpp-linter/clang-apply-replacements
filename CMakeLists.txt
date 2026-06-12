@@ -50,6 +50,6 @@ install(
 
 install(
   DIRECTORY
-    ${CMAKE_BINARY_DIR}/llvm/lib/clang/${LLVM_VERSION_MAJOR}/include
-  DESTINATION clang_apply_replacements/data/lib/clang/${LLVM_VERSION_MAJOR}
+    ${CMAKE_BINARY_DIR}/llvm/lib/clang/${LLVM_VERSION}/include
+  DESTINATION clang_apply_replacements/data/lib/clang/${LLVM_VERSION}
 )
