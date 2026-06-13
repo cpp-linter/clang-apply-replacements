@@ -61,6 +61,13 @@ The version is stored in [`clang-apply-replacements_version.txt`](clang-apply-re
 The format is `<LLVM_MAJOR>.<LLVM_MINOR>.<LLVM_PATCH>`, optionally
 followed by `.<WHEEL_PACKAGING>` for rebuilds of the same LLVM version.
 
+### Monitoring LLVM upstream
+
+A [monitor-llvm workflow][] runs daily to check for new stable LLVM releases.
+When one is found, it automatically creates an issue labeled `llvm-update`.
+
+[monitor-llvm workflow]: https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/monitor-llvm.yml
+
 ### How to release
 
 **Option A — Automated (recommended)**
