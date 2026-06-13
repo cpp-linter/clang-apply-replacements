@@ -1,52 +1,79 @@
-# clang-apply-replacements Python distribution
+<!-- markdownlint-disable MD033 MD041 -->
 
-[![PyPI Release](https://img.shields.io/pypi/v/clang-apply-replacements.svg)](https://pypi.org/project/clang-apply-replacements)
+[issues]: https://github.com/cpp-linter/clang-apply-replacements/issues
+[contributing]: https://github.com/cpp-linter/clang-apply-replacements/blob/main/CONTRIBUTING.md
+[clang-format-wheel]: https://github.com/ssciwr/clang-format-wheel
+[clang-tidy-wheel]: https://github.com/ssciwr/clang-tidy-wheel
+[clang-include-cleaner]: https://github.com/cpp-linter/clang-include-cleaner
+[license]: https://github.com/cpp-linter/clang-apply-replacements/blob/main/LICENSE.md
 
-This project packages the `clang-apply-replacements` utility as a Python package. It allows you to install `clang-apply-replacements` directly from PyPI:
+[llvm-releases]: https://github.com/llvm/llvm-project/releases
+[cpp-linter-hub]: https://cpp-linter.github.io/
 
+# clang-apply-replacements
+
+[![PyPI version](https://img.shields.io/pypi/v/clang-apply-replacements.svg?color=blue)](https://pypi.org/project/clang-apply-replacements/)
+[![Platform](https://img.shields.io/badge/platform-linux--64%20%7C%20linux--arm64%20%7C%20win--64%20%7C%20osx--64%20%7C%20osx--arm64-blue)](https://github.com/cpp-linter/clang-apply-replacements)
+[![Build](https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/release.yml/badge.svg)](https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/release.yml)
+[![PyPI - Downloads](https://img.shields.io/pypi/dw/clang-apply-replacements)](https://pypistats.org/packages/clang-apply-replacements)
+[![cpp-linter hub](https://img.shields.io/badge/%F0%9F%8F%A0_cpp--linter_hub-%E2%86%90_home-22863a)](https://cpp-linter.github.io/)
+
+A Python distribution of `clang-apply-replacements` - the LLVM-based tool
+that applies **serialized `clang-tidy` fix-it replacements** (YAML files) to
+source files. Install it with a single `pip install`, no LLVM toolchain
+required.
+
+---
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Related Projects](#related-projects)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Installation
+
+```bash
+pip install clang-apply-replacements
 ```
-python -m pip install clang-apply-replacements
+
+The wheel bundles a statically-linked binary and clang builtin
+headers - **no LLVM installation is required** on the host machine.
+
+> [!TIP]
+> In CI, use `pipx run clang-apply-replacements` — no install needed.
+> All [GitHub Actions runners](https://docs.github.com/en/actions)
+> ship with `pipx` pre-installed.
+
+Verify:
+
+```bash
+clang-apply-replacements --version
 ```
 
-This project intends to release a new PyPI package for each major and minor release of `clang-apply-replacements`.
+Run `clang-apply-replacements --help` to see all available options.
 
-## What is clang-apply-replacements?
+For full usage documentation, see the
+[upstream docs](https://clang.llvm.org/extra/clang-apply-replacements.html).
 
-`clang-apply-replacements` is an LLVM-based tool that reads serialized `clang-tidy` replacements (fix-it hints) from YAML files and applies them to source files. It is part of the `clang-tools-extra` suite.
+## Related Projects
 
-## Use with pipx
+- [**clang-format-wheel**][clang-format-wheel] — pip-installable clang-format binary
+- [**clang-tidy-wheel**][clang-tidy-wheel] — pip-installable clang-tidy binary
+- [**clang-include-cleaner**][clang-include-cleaner] — pip-installable clang-include-cleaner binary
 
-You can use `pipx` to run clang-apply-replacements, as well. For example, `pipx run clang-apply-replacements <args>` will run clang-apply-replacements without any previous install required on any machine with pipx (including all default GitHub Actions / Azure runners, avoiding requiring a pre-install step or even `actions/setup-python`).
+## Contributing
 
-## Building new releases
+We welcome contributions! See [CONTRIBUTING.md][contributing] for
+development setup, build instructions, and the release process.
 
-The [clang-apply-replacements repository](https://github.com/cpp-linter/clang-apply-replacements) provides the logic to build and publish binary wheels of the `clang-apply-replacements` utility.
+Please use [GitHub issues][issues] for bug reports and feature requests.
 
-In order to add a new release, the following steps are necessary:
+## License
 
-* Edit the [version file](https://github.com/cpp-linter/clang-apply-replacements/blob/main/clang-apply-replacements_version.txt) to reflect the new version.
-* Make a GitHub release to trigger the [GitHub Actions release workflow](https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/release.yml). Alternatively, the workflow can be triggered manually.
+This project is licensed under the Apache License 2.0 with LLVM
+exceptions - see [LICENSE.md][license] for details.
 
-On manual triggers, the following input variables are available:
-* `use_qemu`: Whether to build targets that require emulation (default: `true`)
-* `llvm_version`: Override the LLVM version (default: `""`)
-* `wheel_version`: Override the wheel packaging version (default `"0"`)
-* `deploy_to_testpypi`: Whether to deploy to TestPyPI instead of PyPI (default: `false`)
-
-The repository with the precommit hook is automatically updated using a scheduled Github Actions workflow.
-
-## Acknowledgments
-
-This repository extends the great work of several other projects:
-
-* `clang-apply-replacements` itself is [provided by the LLVM project](https://github.com/llvm/llvm-project) under the Apache 2.0 License with LLVM exceptions.
-* The build logic is based on [scikit-build](https://github.com/scikit-build/scikit-build) which greatly reduces the amount of low level code necessary to package `clang-apply-replacements`.
-* The `scikit-build` packaging examples of [CMake](https://github.com/scikit-build/cmake-python-distributions) and [Ninja](https://github.com/scikit-build/ninja-python-distributions) were very helpful in packaging `clang-apply-replacements`.
-* The CI build process is controlled by [cibuildwheel](https://github.com/pypa/cibuildwheel) which makes building wheels across a number of platforms a pleasant experience (!)
-
-We are grateful for the generous provisioning with CI resources that GitHub currently offers to Open Source projects.
-
-## Troubleshooting
-
-To see which clang-apply-replacements binary the package is using
-you can set `CLANG_APPLY_REPLACEMENTS_WHEEL_VERBOSE` to `1` in your environment.
+The `clang-apply-replacements` binary bundled in the wheels is part of the
+[LLVM Project][llvm-releases] and is provided under the same license.
