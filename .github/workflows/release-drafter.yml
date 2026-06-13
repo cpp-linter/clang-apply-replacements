@@ -1,0 +1,74 @@
+name: Release Drafter
+
+# When a PR changes the version file, automatically create/update a draft
+# GitHub Release so the changes are visible for review before merge.
+#
+# After merge, the auto-tag workflow will tag the commit, which triggers
+# the full build+publish pipeline in release.yml.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'clang-apply-replacements_version.txt'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  draft-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Read version from PR branch
+        id: version
+        run: |
+          VERSION=$(cat clang-apply-replacements_version.txt)
+          echo "value=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Validate version format
+        run: |
+          echo "${{ steps.version.outputs.value }}" | grep -qP '^\d+\.\d+\.\d+(\.\d+)?$' || {
+            echo "::error::Version '${{ steps.version.outputs.value }}' does not match MAJOR.MINOR.PATCH[.PACKAGING]"
+            exit 1
+          }
+
+      - name: Create or update draft release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: v${{ steps.version.outputs.value }}
+          body: |
+            ## clang-apply-replacements v${{ steps.version.outputs.value }}
+
+            > ⚠️ **Draft Release** — automatically generated from PR #${{ github.event.pull_request.number }}.
+            > This release will be published when the PR is merged and the tag is created.
+
+            ### Changes
+            - Version bump to `${{ steps.version.outputs.value }}`
+            - See PR #${{ github.event.pull_request.number }} for details: ${{ github.event.pull_request.html_url }}
+          draft: true
+          # If a draft for this tag already exists, update it; otherwise create new
+          make_latest: false
+
+      - name: Comment on PR
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const version = '${{ steps.version.outputs.value }}';
+            const tag = '${{ steps.version.outputs.tag }}';
+
+            // Find existing draft release for this tag
+            const releases = await github.rest.repos.listReleases({ owner, repo });
+            const draft = releases.data.find(r => r.draft && r.tag_name === tag);
+            const draftUrl = draft ? draft.html_url : `https://github.com/${owner}/${repo}/releases/new?tag=${tag}`;
+
+            await github.rest.issues.createComment({
+              owner, repo,
+              issue_number: context.issue.number,
+              body: `📦 **Draft release prepared**: [${tag}](${draftUrl})\n\nWhen this PR is merged, the tag will be created automatically and the full build+publish pipeline will run.`
+            });

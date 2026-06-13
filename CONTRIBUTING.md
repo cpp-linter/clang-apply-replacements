@@ -65,15 +65,14 @@ followed by `.<WHEEL_PACKAGING>` for rebuilds of the same LLVM version.
 
 1. Edit `clang-apply-replacements_version.txt` to the desired version.
 2. Create a pull request with the version bump.
-3. Once merged, push a matching git tag:
+   - The [release-drafter workflow][] automatically creates a **draft GitHub Release** for review.
+3. Merge the PR.
+   - The [auto-tag workflow][] automatically creates and pushes the git tag.
+   - The [release workflow][] then builds wheels for all platforms, tests them,
+     and publishes to PyPI. The GitHub Release is published automatically.
 
-   ```bash
-   git tag v<major>.<minor>.<patch>
-   git push origin v<major>.<minor>.<patch>
-   ```
-
-4. The [release workflow][] builds wheels for all platforms, tests them,
-   and publishes to PyPI. A GitHub Release is created automatically.
+[release-drafter workflow]: https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/release-drafter.yml
+[auto-tag workflow]: https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/auto-tag.yml
 
 To rebuild the same LLVM version (e.g. to fix a packaging issue), use
 `.post<N>` as the 4th version component, or trigger the workflow
