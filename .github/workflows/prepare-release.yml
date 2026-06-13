@@ -1,0 +1,96 @@
+name: Prepare Release
+
+# Manually trigger to automatically create a version-bump PR with
+# consistent title and description every time.
+#
+#   1. Go to Actions → "Prepare Release" → Run workflow
+#   2. Enter the version (e.g., 16.0.1.0)
+#   3. A PR will be created with the version file updated
+#
+# After the PR is merged:
+#   - auto-tag.yml creates the git tag
+#   - release.yml builds wheels and publishes to PyPI
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version string (MAJOR.MINOR.PATCH[.PACKAGING], e.g. 16.0.1.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'cpp-linter'
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Validate version format
+        run: |
+          V='${{ inputs.version }}'
+          if ! echo "$V" | grep -qP '^\d+\.\d+\.\d+(\.\d+)?$'; then
+            echo "::error::Invalid version format '$V'. Expected MAJOR.MINOR.PATCH[.PACKAGING]"
+            exit 1
+          fi
+          echo "Version $V is valid."
+
+      - name: Update version file
+        run: echo '${{ inputs.version }}' > clang-apply-replacements_version.txt
+
+      - name: Create branch, commit, and push
+        id: branch
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          BRANCH="release/v${VERSION}"
+          git checkout -b "$BRANCH"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Only commit if the version file actually changed
+          if git diff --quiet clang-apply-replacements_version.txt; then
+            echo "Version file unchanged — nothing to commit."
+            echo "skipped=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          git add clang-apply-replacements_version.txt
+          git commit -m "chore: bump version to ${VERSION}"
+          git push origin "$BRANCH"
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+          echo "skipped=false" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        if: steps.branch.outputs.skipped != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+          BRANCH: ${{ steps.branch.outputs.branch }}
+        run: |
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "chore: release v${VERSION}" \
+            --label "release" \
+            --body '## Release v'"${VERSION}"'
+
+          Bump version to **'"${VERSION}"'**.
+
+          > 🤖 This PR was automatically created by the [prepare-release] workflow.
+
+          ### What happens next
+
+          1. Review and merge this PR
+          2. On merge:
+             - A **draft GitHub Release** is created for review
+             - The `v'"${VERSION}"'` tag is created automatically
+             - Wheels are built and published to PyPI
+             - The GitHub Release is published
+
+          [prepare-release]: https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/prepare-release.yml'
