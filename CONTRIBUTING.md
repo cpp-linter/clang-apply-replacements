@@ -66,26 +66,20 @@ followed by `.<WHEEL_PACKAGING>` for rebuilds of the same LLVM version.
 **Option A — Automated (recommended)**
 
 1. Go to **[Actions → Prepare Release][prepare-release workflow]** → "Run workflow".
-2. Enter the version (e.g. `16.0.1.0`) and run.
-   - A PR is auto-created with the version bump, consistent title, and description.
-   - The [release-drafter workflow][] adds a `release` label and creates a **draft GitHub Release**.
+2. Enter the version (e.g. `16.0.1.0`) and run → a PR is auto-created with the version bump.
 3. Review and merge the PR.
-   - The [auto-tag workflow][] automatically creates and pushes the git tag.
-   - The [release workflow][] builds wheels for all platforms, tests them,
-     and publishes to PyPI. The GitHub Release is published automatically.
+   - The [auto-tag workflow][] creates and pushes the git tag.
+   - The [release workflow][] builds wheels, tests them, and publishes to PyPI.
 
 **Option B — Manual**
 
 1. Edit `clang-apply-replacements_version.txt` to the desired version.
 2. Create a pull request with the version bump.
-   - The [release-drafter workflow][] automatically creates a **draft GitHub Release** for review.
 3. Merge the PR.
-   - The [auto-tag workflow][] automatically creates and pushes the git tag.
-   - The [release workflow][] then builds wheels for all platforms, tests them,
-     and publishes to PyPI. The GitHub Release is published automatically.
+   - The [auto-tag workflow][] creates and pushes the git tag.
+   - The [release workflow][] builds wheels, tests them, and publishes to PyPI.
 
 [prepare-release workflow]: https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/prepare-release.yml
-[release-drafter workflow]: https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/release-drafter.yml
 [auto-tag workflow]: https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/auto-tag.yml
 
 To rebuild the same LLVM version (e.g. to fix a packaging issue), use
