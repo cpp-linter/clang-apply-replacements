@@ -47,14 +47,19 @@ jobs:
             exit 0
           fi
 
-          # Check whether the version file changed in this push (compared to previous commit on main)
-          # Using HEAD~1 is safe because push events always have at least one parent
-          if git diff --name-only HEAD~1 HEAD | grep -q 'clang-apply-replacements_version.txt'; then
-            echo "Version file changed — will create tag."
-            echo "skip=false" >> $GITHUB_OUTPUT
+          # On push events: check whether the version file actually changed.
+          # On workflow_dispatch: skip the diff check (manual trigger means intent).
+          if [ "${{ github.event_name }}" = "push" ]; then
+            if git diff --name-only HEAD~1 HEAD | grep -q 'clang-apply-replacements_version.txt'; then
+              echo "Version file changed — will create tag."
+              echo "skip=false" >> $GITHUB_OUTPUT
+            else
+              echo "Version file present but did NOT change in this push — skipping."
+              echo "skip=true" >> $GITHUB_OUTPUT
+            fi
           else
-            echo "Version file present but did NOT change in this push — skipping."
-            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Manual dispatch — creating tag."
+            echo "skip=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Create and push tag

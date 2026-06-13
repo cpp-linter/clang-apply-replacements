@@ -49,6 +49,9 @@ jobs:
           VERSION: ${{ inputs.version }}
         run: |
           BRANCH="release/v${VERSION}"
+
+          # Remove stale branch from a previous run, if any
+          git branch -D "$BRANCH" 2>/dev/null || true
           git checkout -b "$BRANCH"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -73,14 +76,11 @@ jobs:
           VERSION: ${{ inputs.version }}
           BRANCH: ${{ steps.branch.outputs.branch }}
         run: |
-          gh pr create \
-            --base main \
-            --head "$BRANCH" \
-            --title "chore: release v${VERSION}" \
-            --label "release" \
-            --body '## Release v'"${VERSION}"'
+          # Build PR body without leading whitespace
+          cat > /tmp/pr-body.md << 'BODYEOF'
+          ## Release vRELEASE_VERSION
 
-          Bump version to **'"${VERSION}"'**.
+          Bump version to **RELEASE_VERSION**.
 
           > 🤖 This PR was automatically created by the [prepare-release] workflow.
 
@@ -88,9 +88,17 @@ jobs:
 
           1. Review and merge this PR
           2. On merge:
-             - A **draft GitHub Release** is created for review
-             - The `v'"${VERSION}"'` tag is created automatically
+             - The `vRELEASE_VERSION` tag is created automatically
              - Wheels are built and published to PyPI
-             - The GitHub Release is published
+             - A GitHub Release is published
 
-          [prepare-release]: https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/prepare-release.yml'
+          [prepare-release]: https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/prepare-release.yml
+          BODYEOF
+          sed -i "s/RELEASE_VERSION/${VERSION}/g" /tmp/pr-body.md
+
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "chore: release v${VERSION}" \
+            --label "release" \
+            --body-file /tmp/pr-body.md

@@ -37,8 +37,10 @@ jobs:
         run: |
           # Fetch LLVM releases, keep only stable tags (exclude -rc, -rc1, etc.),
           # sort by semver, and pick the highest.
+          # --per-page 100 is enough for all stable LLVM releases; avoids
+          # the --paginate + --jq edge case with nested arrays.
           LATEST=$(gh api repos/llvm/llvm-project/releases \
-            --jq '.[].tag_name' --paginate \
+            --jq '.[].tag_name' --per-page 100 \
             | grep -oP '^llvmorg-\d+\.\d+\.\d+$' \
             | sed 's/llvmorg-//' \
             | sort -V \
@@ -92,10 +94,9 @@ jobs:
             exit 0
           fi
 
-          gh issue create \
-            --title "LLVM ${LATEST} is available — update clang-apply-replacements" \
-            --label llvm-update \
-            --body "New stable LLVM release: [**${TAG}**](https://github.com/llvm/llvm-project/releases/tag/${TAG})
+          # Build issue body without leading whitespace (avoids code-block rendering)
+          cat > /tmp/issue-body.md << BODYEOF
+          New stable LLVM release: [**${TAG}**](https://github.com/llvm/llvm-project/releases/tag/${TAG})
 
           The current packaged version is **${{ steps.current.outputs.value }}**.
 
@@ -108,4 +109,10 @@ jobs:
           ---
           > 🤖 Auto-created by the [monitor-llvm] workflow.
 
-          [monitor-llvm]: ${{ github.server_url }}/${{ github.repository }}/actions/workflows/monitor-llvm.yml"
+          [monitor-llvm]: ${{ github.server_url }}/${{ github.repository }}/actions/workflows/monitor-llvm.yml
+          BODYEOF
+
+          gh issue create \
+            --title "LLVM ${LATEST} is available — update clang-apply-replacements" \
+            --label llvm-update \
+            --body-file /tmp/issue-body.md
