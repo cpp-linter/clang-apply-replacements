@@ -55,7 +55,7 @@ clang-apply-replacements --version
 Run `clang-apply-replacements --help` to see all available options.
 
 For full usage documentation, see the
-[upstream docs](https://clang.llvm.org/extra/clang-apply-replacements.html).
+[upstream docs](https://clang.llvm.org/extra/).
 
 ## Related Projects
 
