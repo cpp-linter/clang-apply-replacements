@@ -19,6 +19,7 @@ ExternalProject_add(build-clang-apply-replacements
   USES_TERMINAL_CONFIGURE 1
   USES_TERMINAL_BUILD 1
   CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DLLVM_ENABLE_ZSTD=OFF -DLLVM_ENABLE_PROJECTS=clang$<SEMICOLON>clang-tools-extra
+    -DCMAKE_C_FLAGS=-U__arm_streaming -DCMAKE_CXX_FLAGS=-U__arm_streaming
   BUILD_COMMAND ${CMAKE_COMMAND} --build . --target clang-apply-replacements
 )
 
