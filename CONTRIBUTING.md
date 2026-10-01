@@ -17,7 +17,7 @@ welcome. For changes to the tool itself, see the
 ## Reporting Issues
 
 - **Bugs and feature requests** — [open an issue](https://github.com/cpp-linter/clang-apply-replacements/issues/new/choose)
-- **Questions** — start a [discussion](https://github.com/cpp-linter/discussions) or use [issues](https://github.com/cpp-linter/clang-apply-replacements/issues)
+- **Questions** — start a [discussion](https://github.com/orgs/cpp-linter/discussions) or use [issues](https://github.com/cpp-linter/clang-apply-replacements/issues)
 
 ## Pull Requests
 

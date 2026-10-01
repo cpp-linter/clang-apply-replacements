@@ -27,8 +27,8 @@ input = "clang-apply-replacements_version.txt"
 test = ["pytest"]
 
 [project.urls]
-Clang = "http://clang.llvm.org/"
-Documentation = "https://clang.llvm.org/extra/clang-apply-replacements.html"
+Clang = "https://clang.llvm.org/"
+Documentation = "https://clang.llvm.org/extra/clang-tidy/"
 Download = "https://github.com/llvm/llvm-project/releases"
 Source = "https://github.com/cpp-linter/clang-apply-replacements"
 

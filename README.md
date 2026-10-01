@@ -1,49 +1,25 @@
-<!-- markdownlint-disable MD033 MD041 -->
-
-[issues]: https://github.com/cpp-linter/clang-apply-replacements/issues
-[contributing]: https://github.com/cpp-linter/clang-apply-replacements/blob/main/CONTRIBUTING.md
-[clang-format-wheel]: https://github.com/ssciwr/clang-format-wheel
-[clang-tidy-wheel]: https://github.com/ssciwr/clang-tidy-wheel
-[clang-include-cleaner]: https://github.com/cpp-linter/clang-include-cleaner
-[license]: https://github.com/cpp-linter/clang-apply-replacements/blob/main/LICENSE.md
-
-[llvm-releases]: https://github.com/llvm/llvm-project/releases
-[cpp-linter-hub]: https://cpp-linter.github.io/
-
 # clang-apply-replacements
 
-[![PyPI version](https://img.shields.io/pypi/v/clang-apply-replacements.svg?color=blue)](https://pypi.org/project/clang-apply-replacements/)
-[![Platform](https://img.shields.io/badge/platform-linux--64%20%7C%20linux--arm64%20%7C%20win--64%20%7C%20osx--64%20%7C%20osx--arm64-blue)](https://github.com/cpp-linter/clang-apply-replacements)
-[![Build](https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/release.yml/badge.svg)](https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/release.yml)
-[![PyPI - Downloads](https://img.shields.io/pypi/dw/clang-apply-replacements)](https://pypistats.org/packages/clang-apply-replacements)
-[![cpp-linter hub](https://img.shields.io/badge/%F0%9F%8F%A0_cpp--linter_hub-%E2%86%90_home-22863a)](https://cpp-linter.github.io/)
+[![PyPI](https://img.shields.io/pypi/v/clang-apply-replacements?labelColor=454a63&color=007ec6)](https://pypi.org/project/clang-apply-replacements/)
+[![part of cpp-linter](https://img.shields.io/badge/part%20of-cpp--linter-ffc20a?labelColor=454a63)](https://cpp-linter.github.io/)
 
-A Python distribution of `clang-apply-replacements` - the LLVM-based tool
-that applies **serialized `clang-tidy` fix-it replacements** (YAML files) to
-source files. Install it with a single `pip install`, no LLVM toolchain
-required.
+A Python wheel of `clang-apply-replacements`, the LLVM-based tool that applies serialized
+`clang-tidy` fix-it replacements (YAML files) to source files.
 
----
+[Website](https://cpp-linter.github.io/) · [Get started](https://cpp-linter.github.io/getting-started/#just-the-clang-tools) · [Discussions](https://github.com/orgs/cpp-linter/discussions)
 
-## Table of Contents
-
-- [Installation](#installation)
-- [Related Projects](#related-projects)
-- [Contributing](#contributing)
-- [License](#license)
-
-## Installation
+## Quick start
 
 ```bash
 pip install clang-apply-replacements
 ```
 
-The wheel bundles a statically-linked binary and clang builtin
-headers - **no LLVM installation is required** on the host machine.
+The wheel bundles the `clang-apply-replacements` binary; no LLVM installation is required on
+the host machine.
 
 > [!TIP]
 > In CI, use `pipx run clang-apply-replacements` — no install needed.
-> All [GitHub Actions runners](https://docs.github.com/en/actions)
+> [GitHub-hosted runners](https://github.com/actions/runner-images)
 > ship with `pipx` pre-installed.
 
 Verify:
@@ -52,28 +28,43 @@ Verify:
 clang-apply-replacements --version
 ```
 
-Run `clang-apply-replacements --help` to see all available options.
+## Usage
 
-For full usage documentation, see the
-[upstream docs](https://clang.llvm.org/extra/).
+`clang-tidy --export-fixes` writes the fixes it suggests to a YAML file, and
+`clang-apply-replacements` applies every `.yaml` file under the directory you give it. With a
+`compile_commands.json` in `build/`:
 
-## Related Projects
+```bash
+mkdir -p fixes
+clang-tidy -p build --export-fixes=fixes/main.yaml src/main.cpp
+clang-apply-replacements --remove-change-desc-files fixes
+```
 
-- [**clang-format-wheel**][clang-format-wheel] — pip-installable clang-format binary
-- [**clang-tidy-wheel**][clang-tidy-wheel] — pip-installable clang-tidy binary
-- [**clang-include-cleaner**][clang-include-cleaner] — pip-installable clang-include-cleaner binary
+- clang-tidy does not create the `fixes` directory, so create it first.
+- `--remove-change-desc-files` deletes the YAML files after applying them. Applying the same
+  file twice edits the source twice and breaks it.
+
+Run `clang-apply-replacements --help` to see all available options. The
+[clang-tidy documentation](https://clang.llvm.org/extra/clang-tidy/) describes `--export-fixes`.
+
+## Supported versions
+
+- PyPI has wheels for LLVM 16 and 17. `pip install clang-apply-replacements` installs the
+  newest; `pip install "clang-apply-replacements==16.*"` installs LLVM 16.
+- Wheels exist for Linux (x86-64, x86, ARM64 and ARMv7 with glibc; x86-64 and x86 with musl),
+  macOS (x86-64 and ARM64) and Windows (x86-64 and x86). On other platforms pip builds the
+  source distribution, which downloads and compiles LLVM.
+- Since 22.1.8, the `clang-tidy` wheel on PyPI also installs a `clang-apply-replacements`
+  command. In an environment with both packages, the one installed last provides the command,
+  and uninstalling either one removes it.
+- For other LLVM versions, the
+  [static binaries](https://github.com/cpp-linter/clang-tools-static-binaries/releases) include
+  clang-apply-replacements for LLVM 12 to 23.
 
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md][contributing] for
-development setup, build instructions, and the release process.
-
-Please use [GitHub issues][issues] for bug reports and feature requests.
+See [CONTRIBUTING.md](https://github.com/cpp-linter/clang-apply-replacements/blob/main/CONTRIBUTING.md) for development setup, build instructions, and the release process, and use [GitHub issues](https://github.com/cpp-linter/clang-apply-replacements/issues) for bug reports and feature requests.
 
 ## License
 
-This project is licensed under the Apache License 2.0 with LLVM
-exceptions - see [LICENSE.md][license] for details.
-
-The `clang-apply-replacements` binary bundled in the wheels is part of the
-[LLVM Project][llvm-releases] and is provided under the same license.
+This project is licensed under the Apache License 2.0 - see [LICENSE.md](https://github.com/cpp-linter/clang-apply-replacements/blob/main/LICENSE.md) for details. The `clang-apply-replacements` binary bundled in the wheels is part of the [LLVM Project](https://github.com/llvm/llvm-project/releases) and is licensed under the [Apache License 2.0 with LLVM Exceptions](https://github.com/llvm/llvm-project/blob/main/LICENSE.TXT).
