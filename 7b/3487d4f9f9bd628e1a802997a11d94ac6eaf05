@@ -1,0 +1,25 @@
+.github/workflows/auto-tag.yml
+  s_f518a1c9328c7b::t_5d31885a55bc35 26
+.github/workflows/monitor-llvm.yml
+  s_f518a1c9328c7b::t_992eb1267fa2ba 23
+.github/workflows/prepare-release.yml
+  s_f518a1c9328c7b::t_922c2036fcc771 32
+.github/workflows/release.yml
+  s_f518a1c9328c7b::t_d3ad9f0ed618c5 67,90,110,131,133
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7b3487d4f9f9bd628e1a802997a11d94ac6eaf05",
+  "prompts": {},
+  "sessions": {
+    "s_f518a1c9328c7b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c2b090ca-b947-4998-975f-5d845a56ad69",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
