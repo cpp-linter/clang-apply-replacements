@@ -49,8 +49,8 @@ Run `clang-apply-replacements --help` to see all available options. The
 
 ## Supported versions
 
-- PyPI has wheels for LLVM 16 and 17. `pip install clang-apply-replacements` installs the
-  newest; `pip install "clang-apply-replacements==16.*"` installs LLVM 16.
+- PyPI has wheels for LLVM 16, 17 and 23. `pip install clang-apply-replacements` installs the
+  newest; `pip install "clang-apply-replacements==17.*"` installs LLVM 17.
 - Wheels exist for Linux (x86-64, x86, ARM64 and ARMv7 with glibc; x86-64 and x86 with musl),
   macOS (x86-64 and ARM64) and Windows (x86-64 and x86). On other platforms pip builds the
   source distribution, which downloads and compiles LLVM.
