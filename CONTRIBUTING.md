@@ -76,7 +76,7 @@ When one is found, it automatically creates an issue labeled `llvm-update`.
 2. Enter the version (e.g. `16.0.1.0`) and run → a PR is auto-created with the version bump.
 3. Review and merge the PR.
    - The [auto-tag workflow][] creates and pushes the git tag.
-   - The [release workflow][] builds wheels, tests them, and publishes to PyPI.
+   - The [publish workflow][] builds wheels, tests them, and publishes to PyPI.
 
 **Option B — Manual**
 
@@ -84,14 +84,14 @@ When one is found, it automatically creates an issue labeled `llvm-update`.
 2. Create a pull request with the version bump.
 3. Merge the PR.
    - The [auto-tag workflow][] creates and pushes the git tag.
-   - The [release workflow][] builds wheels, tests them, and publishes to PyPI.
+   - The [publish workflow][] builds wheels, tests them, and publishes to PyPI.
 
 [prepare-release workflow]: https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/prepare-release.yml
 [auto-tag workflow]: https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/auto-tag.yml
 
 To rebuild the same LLVM version (e.g. to fix a packaging issue), use
 `.post<N>` as the 4th version component, or trigger the workflow
-manually via the [Actions tab][release workflow] with these inputs:
+manually via the [Actions tab][publish workflow] with these inputs:
 
 | Input | Description | Default |
 |-------|-------------|---------|
@@ -100,4 +100,4 @@ manually via the [Actions tab][release workflow] with these inputs:
 | `deploy_to_testpypi` | Deploy to [TestPyPI](https://test.pypi.org/) instead of PyPI | `false` |
 | `use_qemu` | Build QEMU-emulated targets (armv7l, i686) | `true` |
 
-[release workflow]: https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/release.yml
+[publish workflow]: https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/publish.yml

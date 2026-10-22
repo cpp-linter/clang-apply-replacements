@@ -1,7 +1,7 @@
 name: Auto Tag on Version Change
 
 # When a commit lands on main that changed the version file, automatically
-# create and push the corresponding git tag.  The existing release.yml
+# create and push the corresponding git tag.  The existing publish.yml
 # (triggered by tag push) then handles building, testing, and publishing.
 
 on:
@@ -70,4 +70,4 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag -a "${TAG}" -m "Release ${TAG}"
           git push origin "${TAG}"
-          echo "✅ Tag ${TAG} created and pushed — release workflow will start automatically."
+          echo "✅ Tag ${TAG} created and pushed — publish workflow will start automatically."
