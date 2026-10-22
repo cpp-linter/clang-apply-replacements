@@ -9,7 +9,7 @@ name: Prepare Release
 #
 # After the PR is merged:
 #   - auto-tag.yml creates the git tag
-#   - release.yml builds wheels and publishes to PyPI
+#   - publish.yml builds wheels and publishes to PyPI
 
 on:
   workflow_dispatch:
