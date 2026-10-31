@@ -63,8 +63,9 @@ followed by `.<WHEEL_PACKAGING>` for rebuilds of the same LLVM version.
 
 ### Monitoring LLVM upstream
 
-A [monitor-llvm workflow][] runs daily to check for new stable LLVM releases.
-When one is found, it automatically creates an issue labeled `llvm-update`.
+A [monitor-llvm workflow][] runs daily and compares the newest stable LLVM release
+with the newest version on PyPI. When LLVM is ahead, it creates an issue labeled
+`llvm-update`.
 
 [monitor-llvm workflow]: https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/monitor-llvm.yml
 
@@ -75,7 +76,8 @@ When one is found, it automatically creates an issue labeled `llvm-update`.
 1. Go to **[Actions → Prepare Release][prepare-release workflow]** → "Run workflow".
 2. Enter the version (e.g. `16.0.1.0`) and run → a PR is auto-created with the version bump.
 3. Review and merge the PR.
-   - The [auto-tag workflow][] creates and pushes the git tag.
+   - The [auto-tag workflow][] creates and pushes the git tag and starts the
+     [publish workflow][] for it.
    - The [publish workflow][] builds wheels, tests them, and publishes to PyPI.
 
 **Option B — Manual**
@@ -83,14 +85,15 @@ When one is found, it automatically creates an issue labeled `llvm-update`.
 1. Edit `clang-apply-replacements_version.txt` to the desired version.
 2. Create a pull request with the version bump.
 3. Merge the PR.
-   - The [auto-tag workflow][] creates and pushes the git tag.
+   - The [auto-tag workflow][] creates and pushes the git tag and starts the
+     [publish workflow][] for it.
    - The [publish workflow][] builds wheels, tests them, and publishes to PyPI.
 
 [prepare-release workflow]: https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/prepare-release.yml
 [auto-tag workflow]: https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/auto-tag.yml
 
-To rebuild the same LLVM version (e.g. to fix a packaging issue), use
-`.post<N>` as the 4th version component, or trigger the workflow
+To rebuild the same LLVM version (e.g. to fix a packaging issue), add a 4th
+version component of 1 or more (e.g. `23.1.3.1`), or trigger the workflow
 manually via the [Actions tab][publish workflow] with these inputs:
 
 | Input | Description | Default |
