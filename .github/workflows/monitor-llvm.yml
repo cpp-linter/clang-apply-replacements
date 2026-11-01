@@ -27,10 +27,12 @@ jobs:
       - name: Read current packaged LLVM version
         id: current
         run: |
-          FULL=$(cat clang-apply-replacements_version.txt)
+          # Releases are published from the publish workflow, so the newest
+          # version on PyPI is what we package, not the version file.
+          FULL=$(curl -fsSL https://pypi.org/pypi/clang-apply-replacements/json | jq -r .info.version)
           # Extract the LLVM version (first 3 components)
           LLVM=$(echo "$FULL" | grep -oP '^\d+\.\d+\.\d+')
-          echo "value=$LLVM" >> $GITHUB_OUTPUT
+          echo "value=$LLVM" >> "$GITHUB_OUTPUT"
 
       - name: Fetch latest stable LLVM release
         id: latest
@@ -39,10 +41,10 @@ jobs:
         run: |
           # Fetch LLVM releases, keep only stable tags (exclude -rc, -rc1, etc.),
           # sort by semver, and pick the highest.
-          # --per-page 100 is enough for all stable LLVM releases; avoids
-          # the --paginate + --jq edge case with nested arrays.
-          LATEST=$(gh api repos/llvm/llvm-project/releases \
-            --jq '.[].tag_name' --per-page 100 \
+          # The newest 100 releases always include the newest stable one.
+          # gh api has no --per-page flag, so per_page goes in the query string.
+          LATEST=$(gh api 'repos/llvm/llvm-project/releases?per_page=100' \
+            --jq '.[].tag_name' \
             | grep -oP '^llvmorg-\d+\.\d+\.\d+$' \
             | sed 's/llvmorg-//' \
             | sort -V \
@@ -51,15 +53,15 @@ jobs:
           if [ -z "$LATEST" ]; then
             echo "::warning::Could not determine latest stable LLVM version."
           fi
-          echo "value=$LATEST" >> $GITHUB_OUTPUT
+          echo "value=$LATEST" >> "$GITHUB_OUTPUT"
 
       - name: Compare versions
         id: check
         if: steps.latest.outputs.value
+        env:
+          CURRENT: ${{ steps.current.outputs.value }}
+          LATEST: ${{ steps.latest.outputs.value }}
         run: |
-          CURRENT="${{ steps.current.outputs.value }}"
-          LATEST="${{ steps.latest.outputs.value }}"
-
           echo "Current packaged version: $CURRENT"
           echo "Latest stable LLVM:     $LATEST"
 
@@ -71,7 +73,7 @@ jobs:
           # Use sort -V to determine which is semantically greater
           HIGHER=$(printf '%s\n%s' "$CURRENT" "$LATEST" | sort -V | tail -1)
           if [ "$HIGHER" = "$LATEST" ]; then
-            echo "new=true" >> $GITHUB_OUTPUT
+            echo "new=true" >> "$GITHUB_OUTPUT"
           else
             echo "Current version is ahead of latest LLVM release (pre-release tracking?)."
           fi
@@ -80,7 +82,9 @@ jobs:
         if: steps.check.outputs.new == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          CURRENT: ${{ steps.current.outputs.value }}
           LATEST: ${{ steps.latest.outputs.value }}
+          WORKFLOWS_URL: ${{ github.server_url }}/${{ github.repository }}/actions/workflows
         run: |
           TAG="llvmorg-${LATEST}"
 
@@ -100,18 +104,18 @@ jobs:
           cat > /tmp/issue-body.md << BODYEOF
           New stable LLVM release: [**${TAG}**](https://github.com/llvm/llvm-project/releases/tag/${TAG})
 
-          The current packaged version is **${{ steps.current.outputs.value }}**.
+          The current packaged version is **${CURRENT}**.
 
           ### To update
 
-          1. Go to **[Actions → Prepare Release](${{ github.server_url }}/${{ github.repository }}/actions/workflows/prepare-release.yml)** → Run workflow
+          1. Go to **[Actions → Prepare Release](${WORKFLOWS_URL}/prepare-release.yml)** → Run workflow
           2. Enter version \`${LATEST}.0\` and run
           3. Review and merge the auto-created PR
 
           ---
           > 🤖 Auto-created by the [monitor-llvm] workflow.
 
-          [monitor-llvm]: ${{ github.server_url }}/${{ github.repository }}/actions/workflows/monitor-llvm.yml
+          [monitor-llvm]: ${WORKFLOWS_URL}/monitor-llvm.yml
           BODYEOF
 
           gh issue create \
