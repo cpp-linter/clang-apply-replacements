@@ -65,9 +65,20 @@ followed by `.<WHEEL_PACKAGING>` for rebuilds of the same LLVM version.
 
 A [monitor-llvm workflow][] runs daily and compares the newest stable LLVM release
 with the newest version on PyPI. When LLVM is ahead, it creates an issue labeled
-`llvm-update`.
+`llvm-update`. The [publish workflow][] closes the issue when that version, or a
+newer one, has been published.
 
 [monitor-llvm workflow]: https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/monitor-llvm.yml
+
+### Build check on pull requests
+
+The [test workflow][] builds one wheel (manylinux x86-64) and runs the tests on pull
+requests that change the build: `CMakeLists.txt`, `pyproject.toml`, the version file,
+the package or the tests. GitHub does not start it on a pull request that a workflow
+opened, such as the one from Prepare Release: close and reopen that pull request to
+build the new LLVM version before merging.
+
+[test workflow]: https://github.com/cpp-linter/clang-apply-replacements/actions/workflows/test.yml
 
 ### How to release
 

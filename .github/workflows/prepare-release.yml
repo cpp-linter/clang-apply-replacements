@@ -92,8 +92,9 @@ jobs:
 
           ### What happens next
 
-          1. Review and merge this PR
-          2. On merge:
+          1. Close and reopen this PR to start the build check (GitHub does not start CI on a PR that a workflow opened)
+          2. Review and merge this PR
+          3. On merge:
              - The `vRELEASE_VERSION` tag is created automatically
              - Wheels are built and published to PyPI
              - A GitHub Release is published
